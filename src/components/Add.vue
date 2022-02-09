@@ -26,7 +26,7 @@
         <div class="form-check">
           <input
             type="checkbox"
-            class="form-checkinput"
+            class="form-checkinput mr-2"
             :id="item.id"
             :checked="item.state === TodoItemState.DONE"
             :disabled="item.state === TodoItemState.DELETE"

@@ -2,13 +2,15 @@ import { TodoItem } from '@/common/interface'
 import { createStore, Store } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
 import { TodoItemState } from '@/common/const'
+import { storage } from '@/common/utils'
 
 const savePlugin = (store: Store<{
   todos: TodoItem[],
   item: TodoItem
 }>) => {
-  store.subscribe((mutation: any, state: any) => {
-    localStorage.setItem('todo', JSON.stringify(state.todo))
+  store.state.todos = storage.get()
+  store.subscribe((mutation, state) => {
+    storage.set(state.todos)
   })
 }
 
