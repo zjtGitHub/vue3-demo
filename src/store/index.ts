@@ -1,11 +1,21 @@
 import { TodoItem } from '@/common/interface'
-import { createStore } from 'vuex'
+import { createStore, Store } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
 import { TodoItemState } from '@/common/const'
 
+const savePlugin = (store: Store<{
+  todos: TodoItem[],
+  item: TodoItem
+}>) => {
+  store.subscribe((mutation: any, state: any) => {
+    localStorage.setItem('todo', JSON.stringify(state.todo))
+  })
+}
+
 export default createStore({
   state: {
-    todos: [] as TodoItem[]
+    todos: [] as TodoItem[],
+    item: {} as TodoItem
   },
   mutations: {
     add (state, value) {
@@ -18,10 +28,31 @@ export default createStore({
     check (state, id) {
       const index = state.todos.findIndex(todo => todo.id === id)
       state.todos[index].state = state.todos[index].state === TodoItemState.DONE ? TodoItemState.OPEN : TodoItemState.DONE
+    },
+    remove (state, id) {
+      const index = state.todos.findIndex(todo => todo.id === id)
+      state.todos[index].state = TodoItemState.DELETE
+    },
+    clear (state, type: TodoItemState) {
+      state.todos = state.todos.filter(todo => todo.state !== type)
+    },
+    saveEditItem (state, item: TodoItem) {
+      state.item = item
+    },
+    update (state, item: TodoItem) {
+      const index = state.todos.findIndex(todo => todo.id === item.id)
+      state.todos[index] = item
     }
+
   },
   actions: {
   },
   modules: {
-  }
+  },
+  getters: {
+    dones: state => state.todos.filter(todo => todo.state === TodoItemState.DONE),
+    deletes: state => state.todos.filter(todo => todo.state === TodoItemState.DELETE),
+    opens: state => state.todos.filter(todo => todo.state === TodoItemState.OPEN)
+  },
+  plugins: [savePlugin]
 })
